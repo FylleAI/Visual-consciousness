@@ -1,0 +1,33 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node (per il futuro)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Local sandbox (esperimenti non versionati)
+_local/
+sandbox/
+
+# Build output
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*

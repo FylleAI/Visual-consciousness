@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Coscienza — archivio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #050309;
+    --bg-soft: #0d0816;
+    --ink: #f4e8ff;
+    --ink-dim: rgba(232, 217, 255, 0.55);
+    --ink-faint: rgba(232, 217, 255, 0.32);
+    --line: rgba(232, 217, 255, 0.08);
+    --line-strong: rgba(232, 217, 255, 0.18);
+    --accent: hsl(45, 100%, 70%);
+    --accent-violet: hsl(265, 80%, 70%);
+  }
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Fraunces', serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    background-image:
+      radial-gradient(ellipse at 20% 0%, hsla(265, 60%, 30%, 0.18), transparent 50%),
+      radial-gradient(ellipse at 90% 100%, hsla(35, 80%, 40%, 0.08), transparent 50%);
+    background-attachment: fixed;
+  }
+
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: clamp(32px, 5vw, 72px) clamp(20px, 4vw, 48px) 96px;
+  }
+
+  /* ===== HEADER ===== */
+  header.page {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: clamp(40px, 6vw, 72px);
+    flex-wrap: wrap;
+  }
+  .header-text { display: flex; flex-direction: column; gap: 8px; max-width: 520px; }
+  .title {
+    font-family: 'Fraunces', serif;
+    font-weight: 300; font-style: italic;
+    font-size: clamp(36px, 5.5vw, 64px);
+    letter-spacing: -0.02em;
+    line-height: 0.95;
+    color: var(--ink);
+  }
+  .subtitle {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 300; font-size: 11px;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--ink-dim);
+    margin-top: 4px;
+  }
+  .lead {
+    font-family: 'Fraunces', serif;
+    font-style: italic; font-weight: 300;
+    font-size: 17px; line-height: 1.55;
+    color: var(--ink-dim);
+    margin-top: 18px;
+    max-width: 480px;
+  }
+  nav.nav {
+    display: flex; gap: 24px; align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+  nav.nav a {
+    color: var(--ink-dim);
+    text-decoration: none;
+    padding-bottom: 3px;
+    border-bottom: 1px solid transparent;
+    transition: color .25s, border-color .25s;
+  }
+  nav.nav a:hover { color: var(--ink); border-color: var(--line-strong); }
+  nav.nav a.current { color: var(--ink); border-color: var(--accent); }
+
+  /* ===== TOOLBAR ===== */
+  .toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .filters {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .filter {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    background: transparent;
+    border: 1px solid var(--line);
+    padding: 8px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all .2s ease;
+  }
+  .filter:hover { color: var(--ink); border-color: var(--line-strong); }
+  .filter.active {
+    color: var(--bg);
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .filter .count {
+    margin-left: 6px; opacity: 0.6;
+    font-weight: 400;
+  }
+
+  .search-wrap { position: relative; }
+  .search {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--line);
+    padding: 10px 0 10px 28px;
+    color: var(--ink);
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    font-style: italic;
+    font-weight: 300;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .search:focus { border-color: var(--accent); }
+  .search::placeholder { color: var(--ink-faint); font-style: italic; }
+  .search-icon {
+    position: absolute; left: 0; top: 50%;
+    transform: translateY(-50%);
+    color: var(--ink-faint);
+    pointer-events: none;
+  }
+
+  /* ===== ENTRIES ===== */
+  .entries { display: flex; flex-direction: column; }
+  .entry {
+    padding: 28px 0;
+    border-bottom: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 24px;
+    align-items: start;
+    transition: background-color .25s;
+    position: relative;
+  }
+  .entry:hover { background: hsla(265, 30%, 15%, 0.18); }
+
+  .entry-meta {
+    display: flex; flex-direction: column;
+    gap: 6px;
+    padding-top: 4px;
+  }
+  .entry-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 400;
+    letter-spacing: 0.12em;
+    color: var(--ink-faint);
+  }
+  .entry-type {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px; font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    width: fit-content;
+  }
+  .entry-type.tipo-libro    { color: hsl(28, 90%, 70%); }
+  .entry-type.tipo-studio   { color: hsl(45, 100%, 70%); }
+  .entry-type.tipo-articolo { color: hsl(180, 60%, 65%); }
+  .entry-type.tipo-video    { color: hsl(330, 70%, 70%); }
+  .entry-type.tipo-idea     { color: var(--accent-violet); }
+
+  .entry-body { display: flex; flex-direction: column; gap: 10px; }
+  .entry-title-row {
+    display: flex; align-items: baseline; gap: 12px;
+    flex-wrap: wrap;
+  }
+  .entry-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    color: var(--ink);
+    text-decoration: none;
+    transition: color .2s;
+  }
+  .entry-title:hover { color: var(--accent); }
+  .entry-title .arrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    margin-left: 6px;
+    color: var(--ink-faint);
+    transition: transform .2s, color .2s;
+    display: inline-block;
+  }
+  .entry-title:hover .arrow {
+    transform: translate(2px, -2px);
+    color: var(--accent);
+  }
+
+  .entry-author {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px; font-weight: 300;
+    letter-spacing: 0.04em;
+    color: var(--ink-dim);
+  }
+  .entry-author .sep { margin: 0 8px; opacity: 0.4; }
+  .entry-note {
+    font-family: 'Fraunces', serif;
+    font-style: italic; font-weight: 300;
+    font-size: 15.5px;
+    line-height: 1.6;
+    color: var(--ink-dim);
+    margin-top: 4px;
+  }
+  .entry-tags {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-top: 4px;
+  }
+  .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px; font-weight: 400;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    background: hsla(265, 30%, 25%, 0.3);
+    padding: 4px 9px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .tag:hover { color: var(--ink); background: hsla(265, 40%, 35%, 0.5); }
+  .tag.active { color: var(--bg); background: var(--accent); }
+
+  .empty {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--ink-faint);
+    font-style: italic;
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+  }
+
+  /* ===== FOOTER ===== */
+  footer.page {
+    margin-top: 80px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+  }
+  footer.page span.count { color: var(--ink-dim); }
+
+  /* mobile */
+  @media (max-width: 640px) {
+    .entry { grid-template-columns: 1fr; gap: 12px; }
+    .entry-meta { flex-direction: row; gap: 14px; align-items: center; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="page">
+    <div class="header-text">
+      <h1 class="title">archivio</h1>
+      <div class="subtitle">studi · articoli · libri · idee</div>
+      <p class="lead">
+        Una raccolta in evoluzione di fonti, ricerche e pensieri sulla coscienza,
+        la memoria e i sistemi che apprendono. Ogni voce è un nodo che,
+        col tempo, tesse la sua rete.
+      </p>
+    </div>
+    <nav class="nav">
+      <a href="index.html">simulazione</a>
+      <a href="archivio.html" class="current">archivio</a>
+    </nav>
+  </header>
+
+  <div class="toolbar">
+    <div class="filters" id="filters"><!-- popolati via JS --></div>
+    <div class="search-wrap">
+      <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" class="search" id="search" placeholder="cerca per titolo, autore, tag, parola…" />
+    </div>
+  </div>
+
+  <main class="entries" id="entries"><!-- popolato via JS --></main>
+
+  <footer class="page">
+    <div>coscienza · <span class="count" id="footer-count">0</span> voci</div>
+    <div>tracce di una mente che pensa · <a href="index.html" style="color:inherit;text-decoration:none;border-bottom:1px solid var(--line-strong);padding-bottom:1px;">simulazione →</a></div>
+  </footer>
+
+</div>
+
+<script src="fonti.js"></script>
+<script>
+(() => {
+  const TIPI = ["tutti", "studio", "articolo", "libro", "video", "idea"];
+  const TIPO_LABEL = {
+    tutti: "tutti", studio: "studi", articolo: "articoli",
+    libro: "libri", video: "video", idea: "idee"
+  };
+
+  let activeFilter = "tutti";
+  let activeTag = null;
+  let query = "";
+
+  const fonti = (window.FONTI || []).slice().sort((a, b) => {
+    return (b.aggiunto || "").localeCompare(a.aggiunto || "");
+  });
+
+  // ============ FILTERS ============
+  const filtersEl = document.getElementById("filters");
+  function buildFilters() {
+    const counts = { tutti: fonti.length };
+    for (const f of fonti) counts[f.tipo] = (counts[f.tipo] || 0) + 1;
+    filtersEl.innerHTML = "";
+    for (const t of TIPI) {
+      const btn = document.createElement("button");
+      btn.className = "filter" + (activeFilter === t ? " active" : "");
+      btn.dataset.tipo = t;
+      btn.innerHTML = `${TIPO_LABEL[t]} <span class="count">${counts[t] || 0}</span>`;
+      btn.addEventListener("click", () => {
+        activeFilter = t;
+        buildFilters();
+        render();
+      });
+      filtersEl.appendChild(btn);
+    }
+  }
+
+  // ============ SEARCH ============
+  const searchEl = document.getElementById("search");
+  searchEl.addEventListener("input", (e) => {
+    query = e.target.value.trim().toLowerCase();
+    render();
+  });
+
+  // ============ RENDER ============
+  const entriesEl = document.getElementById("entries");
+  const footerCountEl = document.getElementById("footer-count");
+
+  function matches(f) {
+    if (activeFilter !== "tutti" && f.tipo !== activeFilter) return false;
+    if (activeTag && !(f.tag || []).includes(activeTag)) return false;
+    if (query) {
+      const blob = [
+        f.titolo, f.autore, f.nota, f.tipo,
+        ...(f.tag || [])
+      ].join(" ").toLowerCase();
+      if (!blob.includes(query)) return false;
+    }
+    return true;
+  }
+
+  function formatDate(s) {
+    if (!s) return "—";
+    // YYYY-MM-DD → DD.MM.YY
+    const m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!m) return s;
+    return `${m[3]}.${m[2]}.${m[1].slice(2)}`;
+  }
+
+  function render() {
+    const filtered = fonti.filter(matches);
+    footerCountEl.textContent = filtered.length;
+    entriesEl.innerHTML = "";
+
+    if (filtered.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "empty";
+      empty.textContent = "nessuna voce corrisponde a questi criteri.";
+      entriesEl.appendChild(empty);
+      return;
+    }
+
+    for (const f of filtered) {
+      const article = document.createElement("article");
+      article.className = "entry";
+
+      // META
+      const meta = document.createElement("div");
+      meta.className = "entry-meta";
+      const date = document.createElement("div");
+      date.className = "entry-date";
+      date.textContent = formatDate(f.aggiunto);
+      const type = document.createElement("div");
+      type.className = "entry-type tipo-" + f.tipo;
+      type.textContent = TIPO_LABEL[f.tipo] || f.tipo;
+      meta.appendChild(date);
+      meta.appendChild(type);
+
+      // BODY
+      const body = document.createElement("div");
+      body.className = "entry-body";
+
+      const titleRow = document.createElement("div");
+      titleRow.className = "entry-title-row";
+      const titleEl = f.link
+        ? Object.assign(document.createElement("a"), { href: f.link, target: "_blank", rel: "noopener noreferrer" })
+        : document.createElement("span");
+      titleEl.className = "entry-title";
+      titleEl.innerHTML = `${f.titolo}${f.link ? '<span class="arrow">↗</span>' : ''}`;
+      titleRow.appendChild(titleEl);
+      body.appendChild(titleRow);
+
+      if (f.autore || f.anno) {
+        const author = document.createElement("div");
+        author.className = "entry-author";
+        const parts = [];
+        if (f.autore && f.autore !== "—") parts.push(f.autore);
+        if (f.anno) parts.push(String(f.anno));
+        author.innerHTML = parts.join('<span class="sep">·</span>');
+        body.appendChild(author);
+      }
+
+      if (f.nota) {
+        const note = document.createElement("div");
+        note.className = "entry-note";
+        note.textContent = f.nota;
+        body.appendChild(note);
+      }
+
+      if (f.tag && f.tag.length) {
+        const tagsEl = document.createElement("div");
+        tagsEl.className = "entry-tags";
+        for (const t of f.tag) {
+          const tagEl = document.createElement("span");
+          tagEl.className = "tag" + (activeTag === t ? " active" : "");
+          tagEl.textContent = t;
+          tagEl.addEventListener("click", () => {
+            activeTag = activeTag === t ? null : t;
+            render();
+          });
+          tagsEl.appendChild(tagEl);
+        }
+        body.appendChild(tagsEl);
+      }
+
+      article.appendChild(meta);
+      article.appendChild(body);
+      entriesEl.appendChild(article);
+    }
+  }
+
+  buildFilters();
+  render();
+})();
+</script>
+</body>
+</html>
