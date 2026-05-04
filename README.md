@@ -10,6 +10,7 @@ in evoluzione di studi, articoli e idee sull'argomento.
 coscienza/
   index.html         → simulazione (pagina principale)
   archivio.html      → repository di fonti
+  regole.html        → regole del sistema (entità · meccaniche · perché)
   fonti.js           → ★ il file che modifichi per aggiungere voci all'archivio
   README.md          → questo file
   .gitignore

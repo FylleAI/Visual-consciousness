@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Coscienza — regole</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #050309;
+    --bg-soft: #0d0816;
+    --ink: #f4e8ff;
+    --ink-dim: rgba(232, 217, 255, 0.55);
+    --ink-faint: rgba(232, 217, 255, 0.32);
+    --line: rgba(232, 217, 255, 0.08);
+    --line-strong: rgba(232, 217, 255, 0.18);
+    --accent: hsl(45, 100%, 70%);
+    --accent-violet: hsl(265, 80%, 70%);
+  }
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Fraunces', serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    background-image:
+      radial-gradient(ellipse at 20% 0%, hsla(265, 60%, 30%, 0.18), transparent 50%),
+      radial-gradient(ellipse at 90% 100%, hsla(35, 80%, 40%, 0.08), transparent 50%);
+    background-attachment: fixed;
+  }
+
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: clamp(32px, 5vw, 72px) clamp(20px, 4vw, 48px) 96px;
+  }
+
+  /* ===== HEADER ===== */
+  header.page {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: clamp(40px, 6vw, 72px);
+    flex-wrap: wrap;
+  }
+  .header-text { display: flex; flex-direction: column; gap: 8px; max-width: 520px; }
+  .title {
+    font-family: 'Fraunces', serif;
+    font-weight: 300; font-style: italic;
+    font-size: clamp(36px, 5.5vw, 64px);
+    letter-spacing: -0.02em;
+    line-height: 0.95;
+    color: var(--ink);
+  }
+  .subtitle {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 300; font-size: 11px;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--ink-dim);
+    margin-top: 4px;
+  }
+  .lead {
+    font-family: 'Fraunces', serif;
+    font-style: italic; font-weight: 300;
+    font-size: 17px; line-height: 1.55;
+    color: var(--ink-dim);
+    margin-top: 18px;
+    max-width: 480px;
+  }
+  nav.nav {
+    display: flex; gap: 24px; align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+  nav.nav a {
+    color: var(--ink-dim);
+    text-decoration: none;
+    padding-bottom: 3px;
+    border-bottom: 1px solid transparent;
+    transition: color .25s, border-color .25s;
+  }
+  nav.nav a:hover { color: var(--ink); border-color: var(--line-strong); }
+  nav.nav a.current { color: var(--ink); border-color: var(--accent); }
+
+  /* ===== SECTIONS ===== */
+  section {
+    margin-bottom: clamp(48px, 6vw, 72px);
+  }
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px; font-weight: 400;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 24px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  /* ===== ENTITIES ===== */
+  .entities {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+  }
+  .entity {
+    display: flex; flex-direction: column;
+    gap: 10px;
+    padding: 20px 22px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: hsla(265, 30%, 12%, 0.18);
+    transition: background-color .25s, border-color .25s;
+  }
+  .entity:hover { background: hsla(265, 30%, 15%, 0.28); border-color: var(--line-strong); }
+  .entity-glyph {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px; letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; box-shadow: 0 0 14px 2px currentColor; flex-shrink: 0; }
+  .line { width: 22px; height: 1.5px; background: currentColor; box-shadow: 0 0 8px currentColor; flex-shrink: 0; }
+  .dot.active   { color: hsl(35, 100%, 65%); }
+  .dot.memory   { color: hsl(265, 80%, 65%); }
+  .line.path    { color: hsla(38, 100%, 70%, 0.85); }
+  .line.synapse { color: hsla(45, 100%, 75%, 0.95); }
+  .entity-desc {
+    font-family: 'Fraunces', serif;
+    font-style: italic; font-weight: 300;
+    font-size: 15px; line-height: 1.55;
+    color: var(--ink-dim);
+  }
+
+  /* ===== RULES ===== */
+  .rules {
+    display: flex; flex-direction: column;
+  }
+  .rule {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 24px;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--line);
+    align-items: start;
+  }
+  .rule:last-child { border-bottom: none; }
+  .rule-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 28px; font-weight: 300;
+    color: var(--accent);
+    line-height: 1;
+    padding-top: 4px;
+  }
+  .rule-body { display: flex; flex-direction: column; gap: 8px; }
+  .rule-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 400; font-size: 21px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .rule-text {
+    font-family: 'Fraunces', serif;
+    font-style: italic; font-weight: 300;
+    font-size: 16px; line-height: 1.6;
+    color: var(--ink-dim);
+  }
+
+  /* ===== WHY ===== */
+  .why-quote {
+    font-family: 'Fraunces', serif;
+    font-style: italic; font-weight: 300;
+    font-size: 22px; line-height: 1.45;
+    color: var(--ink);
+    border-left: 2px solid var(--accent);
+    padding: 4px 0 4px 22px;
+    margin-bottom: 32px;
+    max-width: 640px;
+  }
+  .pillars {
+    display: flex; flex-direction: column;
+    gap: 22px;
+  }
+  .pillar {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+    align-items: baseline;
+  }
+  .pillar:last-child { border-bottom: none; }
+  .pillar-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--accent-violet);
+  }
+  .pillar-text {
+    font-family: 'Fraunces', serif;
+    font-style: italic; font-weight: 300;
+    font-size: 16px; line-height: 1.6;
+    color: var(--ink-dim);
+  }
+  .ref-link {
+    margin-top: 28px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.14em;
+    color: var(--ink-dim);
+  }
+  .ref-link a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid var(--line-strong);
+    padding-bottom: 1px;
+    transition: border-color .2s;
+  }
+  .ref-link a:hover { border-color: var(--accent); }
+
+  /* ===== FOOTER ===== */
+  footer.page {
+    margin-top: 80px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+  }
+  footer.page a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--line-strong); padding-bottom: 1px; }
+
+  /* mobile */
+  @media (max-width: 640px) {
+    .pillar { grid-template-columns: 1fr; gap: 6px; }
+    .rule { grid-template-columns: 40px 1fr; gap: 16px; }
+    .rule-num { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="page">
+    <div class="header-text">
+      <h1 class="title">regole</h1>
+      <div class="subtitle">il sistema in chiaro</div>
+      <p class="lead">
+        Cosa stai guardando nella simulazione, in sette mosse.
+        Le entità che la abitano, le regole che la fanno evolvere,
+        e — sotto — il perché di queste regole.
+      </p>
+    </div>
+    <nav class="nav">
+      <a href="index.html">simulazione</a>
+      <a href="archivio.html">archivio</a>
+      <a href="regole.html" class="current">regole</a>
+    </nav>
+  </header>
+
+  <section>
+    <div class="section-label">— entità</div>
+    <div class="entities">
+      <div class="entity">
+        <div class="entity-glyph"><span class="dot active"></span> impulso</div>
+        <div class="entity-desc">Un punto in moto. Un pensiero in transito: ha direzione, velocità, vita breve.</div>
+      </div>
+      <div class="entity">
+        <div class="entity-glyph"><span class="dot memory"></span> ricordo</div>
+        <div class="entity-desc">Un punto fermo che pulsa. Una traccia stabile — ma non immutabile: l'intensità sale con l'uso e scende con l'inattività.</div>
+      </div>
+      <div class="entity">
+        <div class="entity-glyph"><span class="line path"></span> sentiero</div>
+        <div class="entity-desc">La scia dorata che un impulso lascia dietro di sé. Persiste pochi secondi: il substrato si modifica con l'uso.</div>
+      </div>
+      <div class="entity">
+        <div class="entity-glyph"><span class="line synapse"></span> sinapsi</div>
+        <div class="entity-desc">Una linea sottile tra due ricordi che si sono toccati. Si rafforza con la co-attivazione, svanisce con l'oblio.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">— meccaniche</div>
+    <div class="rules">
+
+      <div class="rule">
+        <div class="rule-num">01</div>
+        <div class="rule-body">
+          <div class="rule-name">Trasferimento</div>
+          <div class="rule-text">
+            Quando un impulso colpisce un ricordo, scambiano stato: l'impulso si ferma e
+            diventa ricordo, il ricordo toccato parte come impulso. Movimento e memoria
+            sono la stessa cosa in fasi diverse.
+          </div>
+        </div>
+      </div>
+
+      <div class="rule">
+        <div class="rule-num">02</div>
+        <div class="rule-body">
+          <div class="rule-name">Plasticità hebbiana</div>
+          <div class="rule-text">
+            Ogni collisione rinforza la sinapsi tra i due nodi e ne fa crescere intensità
+            e raggio. <em>Ciò che si attiva insieme, si lega.</em>
+          </div>
+        </div>
+      </div>
+
+      <div class="rule">
+        <div class="rule-num">03</div>
+        <div class="rule-body">
+          <div class="rule-name">Decadimento</div>
+          <div class="rule-text">
+            Un ricordo non toccato per circa nove secondi inizia a spegnersi:
+            intensità e raggio si contraggono lentamente. Senza uso, tutto svanisce.
+          </div>
+        </div>
+      </div>
+
+      <div class="rule">
+        <div class="rule-num">04</div>
+        <div class="rule-body">
+          <div class="rule-name">Oblio</div>
+          <div class="rule-text">
+            Sotto una soglia minima di intensità, e dopo lunga inattività, il ricordo
+            può essere rimosso. Le sue sinapsi vanno con lui. Lo schema si comprime.
+          </div>
+        </div>
+      </div>
+
+      <div class="rule">
+        <div class="rule-num">05</div>
+        <div class="rule-body">
+          <div class="rule-name">Recall spontaneo</div>
+          <div class="rule-text">
+            Anche senza stimolo esterno, ogni tanto un ricordo si riattiva. La probabilità
+            è proporzionale alla sua intensità: i ricordi vivi tornano più spesso.
+          </div>
+        </div>
+      </div>
+
+      <div class="rule">
+        <div class="rule-num">06</div>
+        <div class="rule-body">
+          <div class="rule-name">Adjacent possible</div>
+          <div class="rule-text">
+            Raramente, durante una collisione, nasce un nuovo nodo nel punto d'incontro.
+            La novità non viene dal nulla: emerge dall'interazione di ciò che già c'è.
+          </div>
+        </div>
+      </div>
+
+      <div class="rule">
+        <div class="rule-num">07</div>
+        <div class="rule-body">
+          <div class="rule-name">Stimolo esogeno</div>
+          <div class="rule-text">
+            Un click attiva il ricordo più vicino — o ne crea uno nuovo, se nessuno
+            è abbastanza vicino. È un feedback ad alta precisione: cambia il sistema
+            più di un evento spontaneo.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">— perché queste regole</div>
+
+    <p class="why-quote">
+      Il sistema non è una visualizzazione decorativa. È l'implementazione operativa
+      minimale di una tesi: l'intelligenza non emerge dall'integrazione statica
+      dell'informazione, ma dalla messa in moto.
+    </p>
+
+    <div class="pillars">
+      <div class="pillar">
+        <div class="pillar-name">predictive processing</div>
+        <div class="pillar-text">
+          Friston, Clark. Il cervello minimizza la sorpresa aggiornando il proprio
+          modello interno. Ogni ricordo è una predizione che cerca conferma.
+        </div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-name">cas / schema</div>
+        <div class="pillar-text">
+          Gell-Mann. I sistemi adattivi comprimono regolarità in schemi: predicono,
+          agiscono, ricevono feedback, evolvono. Il decadimento è coarse-graining.
+        </div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-name">substrate gap</div>
+        <div class="pillar-text">
+          Il neurone <em>è</em> la sua storia: ogni attivazione lo modifica.
+          Il transistor no. La traccia che vedi sullo schermo è la prima compensazione
+          via software di questa asimmetria.
+        </div>
+      </div>
+    </div>
+
+    <div class="ref-link">
+      → mappa completa meccaniche ↔ teoria:
+      <a href="https://github.com/FylleAI/Visual-consciousness/blob/main/docs/THESIS.md" target="_blank" rel="noopener noreferrer">docs/THESIS.md</a>
+    </div>
+  </section>
+
+  <footer class="page">
+    <div>coscienza · regole del sistema</div>
+    <div>il loop è costitutivo · <a href="index.html">simulazione →</a></div>
+  </footer>
+
+</div>
+</body>
+</html>
