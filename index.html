@@ -70,10 +70,23 @@
     font-family: 'JetBrains Mono', monospace;
     font-size: 10.5px; letter-spacing: 0.14em;
     text-transform: uppercase; color: rgba(232, 217, 255, 0.6);
+    pointer-events: auto;
   }
-  .legend-item { display: flex; align-items: center; gap: 10px; }
-  .dot { width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 0 12px 2px currentColor; }
-  .line { width: 18px; height: 1px; background: currentColor; box-shadow: 0 0 6px currentColor; }
+  .legend-item {
+    display: flex; align-items: center; gap: 10px;
+    cursor: pointer;
+    user-select: none;
+    padding: 4px 6px;
+    margin: -4px -6px;
+    border-radius: 3px;
+    transition: opacity .2s, color .2s;
+  }
+  .legend-item:hover { color: #f4e8ff; }
+  .legend-item.off { opacity: 0.32; }
+  .legend-item.off .dot,
+  .legend-item.off .line { box-shadow: none; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 0 12px 2px currentColor; transition: box-shadow .2s; }
+  .line { width: 18px; height: 1px; background: currentColor; box-shadow: 0 0 6px currentColor; transition: box-shadow .2s; }
   .dot.active { color: hsl(35, 100%, 65%); }
   .dot.memory { color: hsl(265, 80%, 65%); }
   .line.path { color: hsla(38, 100%, 70%, 0.7); }
@@ -127,11 +140,11 @@
       </nav>
     </div>
     <div class="footer">
-      <div class="legend">
-        <div class="legend-item"><span class="dot active"></span> impulso</div>
-        <div class="legend-item"><span class="dot memory"></span> ricordo</div>
-        <div class="legend-item"><span class="line path"></span> sentiero</div>
-        <div class="legend-item"><span class="line synapse"></span> sinapsi</div>
+      <div class="legend" id="legend">
+        <div class="legend-item" data-filter="impulse" title="mostra/nascondi impulsi"><span class="dot active"></span> impulso</div>
+        <div class="legend-item" data-filter="memory"  title="mostra/nascondi ricordi"><span class="dot memory"></span> ricordo</div>
+        <div class="legend-item" data-filter="path"    title="mostra/nascondi sentieri"><span class="line path"></span> sentiero</div>
+        <div class="legend-item" data-filter="synapse" title="mostra/nascondi sinapsi"><span class="line synapse"></span> sinapsi</div>
       </div>
       <div class="stats">
         impulsi <span id="count-active">00</span><br />
@@ -346,41 +359,51 @@
     }
   }
 
+  const visible = { impulse: true, memory: true, path: true, synapse: true };
+
   function render() {
     ctx.globalCompositeOperation = 'source-over';
     ctx.fillStyle = 'rgba(5, 3, 9, 0.22)';
     ctx.fillRect(0, 0, W, H);
-    ctx.globalCompositeOperation = 'lighter';
-    ctx.globalAlpha = 0.55;
-    ctx.drawImage(pathCanvas, 0, 0, W, H);
-    ctx.globalAlpha = 1;
+    if (visible.path) {
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = 0.55;
+      ctx.drawImage(pathCanvas, 0, 0, W, H);
+      ctx.globalAlpha = 1;
+    }
     ctx.globalCompositeOperation = 'source-over';
 
-    for (const c of connections.values()) {
-      const s = c.strength; if (s < 0.06) continue;
-      const a = c.a, b = c.b;
-      const dx = b.x - a.x, dy = b.y - a.y;
-      const d2 = dx * dx + dy * dy;
-      if (d2 > 90000) continue;
-      const alpha = Math.min(0.45, s * 0.32);
-      const t = Math.min(1, s / 1.0);
-      const hue = 270 - t * 230;
-      const sat = 70 + t * 25;
-      const light = 55 + t * 15;
-      ctx.strokeStyle = `hsla(${hue}, ${sat}%, ${light}%, ${alpha})`;
-      ctx.lineWidth = 0.4 + s * 0.9;
-      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+    if (visible.synapse) {
+      for (const c of connections.values()) {
+        const s = c.strength; if (s < 0.06) continue;
+        const a = c.a, b = c.b;
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const d2 = dx * dx + dy * dy;
+        if (d2 > 90000) continue;
+        const alpha = Math.min(0.45, s * 0.32);
+        const t = Math.min(1, s / 1.0);
+        const hue = 270 - t * 230;
+        const sat = 70 + t * 25;
+        const light = 55 + t * 15;
+        ctx.strokeStyle = `hsla(${hue}, ${sat}%, ${light}%, ${alpha})`;
+        ctx.lineWidth = 0.4 + s * 0.9;
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+      }
     }
-    for (const n of neurons) { if (!n.active) drawMemory(n); }
-    for (const r of collisions) {
-      const p = r.t / r.life;
-      const radius = r.maxR * p;
-      const alpha = (1 - p) * 0.4;
-      ctx.beginPath(); ctx.arc(r.x, r.y, radius, 0, Math.PI * 2);
-      ctx.strokeStyle = `hsla(40, 100%, 70%, ${alpha})`;
-      ctx.lineWidth = 1; ctx.stroke();
+    if (visible.memory) {
+      for (const n of neurons) { if (!n.active) drawMemory(n); }
     }
-    for (const n of neurons) { if (n.active) drawActive(n); }
+    if (visible.impulse) {
+      for (const r of collisions) {
+        const p = r.t / r.life;
+        const radius = r.maxR * p;
+        const alpha = (1 - p) * 0.4;
+        ctx.beginPath(); ctx.arc(r.x, r.y, radius, 0, Math.PI * 2);
+        ctx.strokeStyle = `hsla(40, 100%, 70%, ${alpha})`;
+        ctx.lineWidth = 1; ctx.stroke();
+      }
+      for (const n of neurons) { if (n.active) drawActive(n); }
+    }
   }
 
   function drawMemory(n) {
@@ -458,6 +481,21 @@
   canvas.addEventListener('pointerdown', (e) => spawnAt(e.clientX, e.clientY));
   canvas.addEventListener('pointermove', (e) => {
     if (e.buttons === 1) spawnAt(e.clientX, e.clientY);
+  });
+
+  const legendEl = document.getElementById('legend');
+  legendEl.addEventListener('click', (e) => {
+    const item = e.target.closest('.legend-item');
+    if (!item) return;
+    const key = item.dataset.filter;
+    visible[key] = !visible[key];
+    item.classList.toggle('off', !visible[key]);
+    if (!visible.impulse && !visible.memory && !visible.path && !visible.synapse) {
+      for (const k of Object.keys(visible)) {
+        visible[k] = true;
+        legendEl.querySelector(`[data-filter="${k}"]`).classList.remove('off');
+      }
+    }
   });
 
   const elActive = document.getElementById('count-active');
